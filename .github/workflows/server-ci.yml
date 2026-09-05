@@ -1,0 +1,39 @@
+name: Server CI
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+      - 'server-ci.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'server/**'
+
+jobs:
+  validate-server:
+    name: Lint, Format & Test
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+      - name: Clonar o Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar o Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Validar Formatação (FMT)
+        run: deno fmt --check
+
+      - name: Análise Estática (Lint)
+        run: deno lint
+
+      - name: Executar Testes
+        run: deno test --allow-net --allow-env

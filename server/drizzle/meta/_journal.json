@@ -8,6 +8,20 @@
       "when": 1788738852985,
       "tag": "0000_flowery_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788812037579,
+      "tag": "0001_rare_goliath",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788813248036,
+      "tag": "0002_melodic_wong",
+      "breakpoints": true
     }
   ]
 }

@@ -1,11 +1,11 @@
 {
-  "id": "02dc0cb7-9739-4124-9eb7-8abec7b8008d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "ad452110-a090-40fd-9ddb-758ccbf2fb88",
+  "prevId": "987166fe-061c-4c77-943b-c15a74349a63",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.account_status": {
-      "name": "account_status",
+    "public.account_history": {
+      "name": "account_history",
       "schema": "",
       "columns": {
         "id": {
@@ -26,8 +26,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "new_date": {
-          "name": "new_date",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
@@ -40,11 +40,27 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_account_history_user_id": {
+          "name": "idx_account_history_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "account_status_user_id_users_id_fk": {
-          "name": "account_status_user_id_users_id_fk",
-          "tableFrom": "account_status",
+        "account_history_user_id_users_id_fk": {
+          "name": "account_history_user_id_users_id_fk",
+          "tableFrom": "account_history",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -55,22 +71,22 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "account_status_new_account_users_role_fk": {
-          "name": "account_status_new_account_users_role_fk",
-          "tableFrom": "account_status",
+        "account_history_new_account_users_id_fk": {
+          "name": "account_history_new_account_users_id_fk",
+          "tableFrom": "account_history",
           "tableTo": "users",
           "columnsFrom": [
             "new_account"
           ],
           "columnsTo": [
-            "role"
+            "id"
           ],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "account_status_permit_user_id_users_id_fk": {
-          "name": "account_status_permit_user_id_users_id_fk",
-          "tableFrom": "account_status",
+        "account_history_permit_user_id_users_id_fk": {
+          "name": "account_history_permit_user_id_users_id_fk",
+          "tableFrom": "account_history",
           "tableTo": "users",
           "columnsFrom": [
             "permit_user_id"
@@ -88,8 +104,47 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user_logs": {
-      "name": "user_logs",
+    "public.accounts": {
+      "name": "accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "full_name": {
+          "name": "full_name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "accounts_full_name_unique": {
+          "name": "accounts_full_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "full_name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.logins_history": {
+      "name": "logins_history",
       "schema": "",
       "columns": {
         "id": {
@@ -124,11 +179,27 @@
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "user_logs_user_id_idx": {
+          "name": "user_logs_user_id_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "user_logs_user_id_users_id_fk": {
-          "name": "user_logs_user_id_users_id_fk",
-          "tableFrom": "user_logs",
+        "logins_history_user_id_users_id_fk": {
+          "name": "logins_history_user_id_users_id_fk",
+          "tableFrom": "logins_history",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -139,15 +210,15 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "user_logs_role_users_role_fk": {
-          "name": "user_logs_role_users_role_fk",
-          "tableFrom": "user_logs",
+        "logins_history_role_users_id_fk": {
+          "name": "logins_history_role_users_id_fk",
+          "tableFrom": "logins_history",
           "tableTo": "users",
           "columnsFrom": [
             "role"
           ],
           "columnsTo": [
-            "role"
+            "id"
           ],
           "onDelete": "restrict",
           "onUpdate": "no action"
@@ -159,13 +230,13 @@
       "checkConstraints": {
         "logout_after_login_check": {
           "name": "logout_after_login_check",
-          "value": "\"user_logs\".\"logout\" IS NULL OR \"user_logs\".\"logout\" >= \"user_logs\".\"login\""
+          "value": "\"logins_history\".\"logout\" IS NULL OR \"logins_history\".\"logout\" >= \"logins_history\".\"login\""
         }
       },
       "isRLSEnabled": false
     },
-    "public.role_status": {
-      "name": "role_status",
+    "public.role_history": {
+      "name": "role_history",
       "schema": "",
       "columns": {
         "id": {
@@ -180,14 +251,14 @@
           "primaryKey": false,
           "notNull": true
         },
-        "new_role": {
-          "name": "new_role",
+        "new_role_id": {
+          "name": "new_role_id",
           "type": "integer",
           "primaryKey": false,
           "notNull": true
         },
-        "new_date": {
-          "name": "new_date",
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
@@ -200,11 +271,27 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_role_history_user_id": {
+          "name": "idx_role_history_user_id",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
-        "role_status_user_id_users_id_fk": {
-          "name": "role_status_user_id_users_id_fk",
-          "tableFrom": "role_status",
+        "role_history_user_id_users_id_fk": {
+          "name": "role_history_user_id_users_id_fk",
+          "tableFrom": "role_history",
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
@@ -215,12 +302,12 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "role_status_new_role_users_id_fk": {
-          "name": "role_status_new_role_users_id_fk",
-          "tableFrom": "role_status",
+        "role_history_new_role_id_users_id_fk": {
+          "name": "role_history_new_role_id_users_id_fk",
+          "tableFrom": "role_history",
           "tableTo": "users",
           "columnsFrom": [
-            "new_role"
+            "new_role_id"
           ],
           "columnsTo": [
             "id"
@@ -228,9 +315,9 @@
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
-        "role_status_permit_user_id_users_id_fk": {
-          "name": "role_status_permit_user_id_users_id_fk",
-          "tableFrom": "role_status",
+        "role_history_permit_user_id_users_id_fk": {
+          "name": "role_history_permit_user_id_users_id_fk",
+          "tableFrom": "role_history",
           "tableTo": "users",
           "columnsFrom": [
             "permit_user_id"
@@ -244,6 +331,45 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.roles": {
+      "name": "roles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "roles_role_unique": {
+          "name": "roles_role_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "role"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -278,19 +404,15 @@
         },
         "role": {
           "name": "role",
-          "type": "user_role",
-          "typeSchema": "public",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'user'"
+          "notNull": true
         },
         "account": {
           "name": "account",
-          "type": "user_account",
-          "typeSchema": "public",
+          "type": "integer",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'active'"
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -298,10 +420,50 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "users_role_roles_id_fk": {
+          "name": "users_role_roles_id_fk",
+          "tableFrom": "users",
+          "tableTo": "roles",
+          "columnsFrom": [
+            "role"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "users_account_accounts_id_fk": {
+          "name": "users_account_accounts_id_fk",
+          "tableFrom": "users",
+          "tableTo": "accounts",
+          "columnsFrom": [
+            "account"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "users_email_unique": {
@@ -354,26 +516,7 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {
-    "public.user_account": {
-      "name": "user_account",
-      "schema": "public",
-      "values": [
-        "active",
-        "suspended",
-        "cancelled"
-      ]
-    },
-    "public.user_role": {
-      "name": "user_role",
-      "schema": "public",
-      "values": [
-        "guest",
-        "user",
-        "admin"
-      ]
-    }
-  },
+  "enums": {},
   "schemas": {},
   "sequences": {},
   "roles": {},
